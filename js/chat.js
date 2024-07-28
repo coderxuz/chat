@@ -49,11 +49,13 @@ form.addEventListener("submit", (e) => {
         if(localStorage.getItem('user')==='user'){
             if(item.AdminActive === true){
                 textshow()
+                location.reload();
             }
         }
         else{
             if(item.userActive === true){
                 textshow()
+                location.reload();
             }
         }
     }

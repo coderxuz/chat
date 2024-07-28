@@ -1,12 +1,12 @@
 const nameDiv = document.querySelector(".name");
 const content = document.querySelector(".content");
 const form = document.querySelector("form");
-const h1 = document.createElement('h1')
-nameDiv.appendChild(h1)
-h1.innerHTML = localStorage.getItem('user')
-const  deleteBtn = document.createElement('button')
-deleteBtn.innerHTML = 'Clear'
-nameDiv.appendChild(deleteBtn)
+const h1 = document.createElement("h1");
+nameDiv.appendChild(h1);
+h1.innerHTML = localStorage.getItem("user");
+const deleteBtn = document.createElement("button");
+deleteBtn.innerHTML = "Clear";
+nameDiv.appendChild(deleteBtn);
 const get = async (resurs) => {
   const request = await fetch(resurs);
   const data = await request.json();
@@ -22,12 +22,33 @@ const post = async (url, data = {}) => {
       },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      throw new Error(`Xatolik yuz berdi: ${response.statusText}`);
+    }
+    return await response.json();
   } catch (err) {
-    console.error(err);
+    console.error("Xato:", err);
+  }
+};
+const put = async (url, data) => {
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Xatolik yuz berdi: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (err) {
+    console.error("Xato:", err);
   }
 };
 form.addEventListener("submit", (e) => {
-    e.preventDefault()
+  e.preventDefault();
   if (!form.text.value) {
     e.preventDefault();
   } else {
@@ -37,35 +58,36 @@ form.addEventListener("submit", (e) => {
     };
     post("https://chat-server-json.onrender.com/chat", text);
     setTimeout(() => {
-       
-        textshow();
+      textshow();
     }, 500);
-        
   }
-  form.text.value = ''
-  get('https://chat-server-json.onrender.com/active').then((data)=>{
-    for(item of data){
-        console.log(item);
-        if(localStorage.getItem('user')==='user'){
-            if(item.AdminActive === true){
-                textshow()
-                location.reload();
-            }
-        }
-        else{
-            if(item.userActive === true){
-                textshow()
-                location.reload();
-            }
-        }
+  form.text.value = "";
+});
+get("https://chat-server-json.onrender.com/active").then((data) => {
+  let dataArr = Array.from(data);
+
+  for (const item of dataArr) {
+    console.log(item);
+    if (localStorage.getItem("user") === "user") {
+      if (item.AdminActive === false) {
+        // textshow()
+        // location.reload();
+        dataArr[0].userActive = true;
+        put('https://chat-server-json.onrender.com/active', dataArr)
+      }
+    } else {
+      if (item.userActive === true) {
+        textshow();
+        location.reload();
+      }
     }
-})
+  }
 });
 window.addEventListener("DOMContentLoaded", textshow());
 function textshow() {
   get("https://chat-server-json.onrender.com/chat").then((data) => {
     const dataArr = Array.from(data);
-    content.innerHTML=''
+    content.innerHTML = "";
     dataArr.map((item) => {
       const box = document.createElement("div");
       const boxInner = document.createElement("div");
@@ -83,25 +105,23 @@ function textshow() {
     });
   });
 }
-const deleteMessage = async (url)=>{
-    try{
-        const response= await fetch(url)
-        const data = await response.json()
-        for(item of data){
-            const deleteMess= await fetch(`${url}/${item.id}`,{
-                method:'DELETE'
-            })
-        }
-    }catch(err){
-        console.error(err)
+const deleteMessage = async (url) => {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    for (item of data) {
+      const deleteMess = await fetch(`${url}/${item.id}`, {
+        method: "DELETE",
+      });
     }
-}
-deleteBtn.addEventListener('click', (e)=>{
-    e.preventDefault()
-    deleteMessage('https://chat-server-json.onrender.com/chat')
-    setTimeout(() => {
-        location.reload();
-        
-    }, 3000);
-    
-})
+  } catch (err) {
+    console.error(err);
+  }
+};
+deleteBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  deleteMessage("https://chat-server-json.onrender.com/chat");
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
+});

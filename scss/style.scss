@@ -1,0 +1,66 @@
+*{
+    padding: 0;
+    margin: 0; 
+    box-sizing: border-box;
+}
+// Variables
+$font-stack: Helvetica, sans-serif;
+$primary-color: #333;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin transition($property, $duration) {
+  transition: $property $duration ease-in-out;
+}
+
+// Base styles
+body {
+  font-family: $font-stack;
+  background-color: #f4f4f9;
+  @include flex-center;
+  height: 100vh;
+}
+
+form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  @include flex-center;
+  flex-direction: column;
+
+  input[type="text"],
+  input[type="password"],
+  input[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    border-color: $primary-color;
+    outline: none;
+    @include transition(border-color, 0.3s);
+  }
+
+  input[type="submit"] {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    cursor: pointer;
+    @include transition(background-color, 0.3s);
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+}

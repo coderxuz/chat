@@ -30,13 +30,13 @@ form.addEventListener("submit", (e) => {
       user: localStorage.getItem("user"),
       text: form.text.value,
     };
-    post("http://localhost:3000/chat", text);
+    post("https://chat-server-json.onrender.com/chat", text);
     textshow();
   }
 });
 window.addEventListener("DOMContentLoaded", textshow());
 function textshow() {
-  get("http://localhost:3000/chat").then((data) => {
+  get("https://chat-server-json.onrender.com/chat").then((data) => {
     const dataArr = Array.from(data);
     dataArr.map((item) => {
       const box = document.createElement("div");

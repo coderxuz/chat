@@ -6,7 +6,7 @@ const get = async (resurs) => {
 };
 const userValue = localStorage.getItem("user");
 const check = (value) => {
-  get("http://localhost:3000/users")
+  get("https://chat-server-json.onrender.com/users")
     .then((data) => {
       const dataArr = Array.from(data);
       console.log(data);

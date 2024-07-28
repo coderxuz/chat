@@ -43,6 +43,21 @@ form.addEventListener("submit", (e) => {
         
   }
   form.text.value = ''
+  get('https://chat-server-json.onrender.com/active').then((data)=>{
+    for(item of data){
+        console.log(item);
+        if(localStorage.getItem('user')==='user'){
+            if(item.AdminActive === true){
+                textshow()
+            }
+        }
+        else{
+            if(item.userActive === true){
+                textshow()
+            }
+        }
+    }
+})
 });
 window.addEventListener("DOMContentLoaded", textshow());
 function textshow() {

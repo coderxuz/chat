@@ -1,13 +1,18 @@
 const nameDiv = document.querySelector(".name");
 const content = document.querySelector(".content");
 const form = document.querySelector("form");
-
+const h1 = document.createElement('h1')
+nameDiv.appendChild(h1)
+h1.innerHTML = localStorage.getItem('user')
+const  deleteBtn = document.createElement('button')
+deleteBtn.innerHTML = 'Clear'
+nameDiv.appendChild(deleteBtn)
 const get = async (resurs) => {
   const request = await fetch(resurs);
   const data = await request.json();
   return data;
 };
-nameDiv.innerHTML = `<h1>${localStorage.getItem("user")}</h1>`;
+
 const post = async (url, data = {}) => {
   try {
     const response = await fetch(url, {
@@ -31,13 +36,19 @@ form.addEventListener("submit", (e) => {
       text: form.text.value,
     };
     post("https://chat-server-json.onrender.com/chat", text);
-    textshow();
+    setTimeout(() => {
+       
+        textshow();
+    }, 500);
+        
   }
+  form.text.value = ''
 });
 window.addEventListener("DOMContentLoaded", textshow());
 function textshow() {
   get("https://chat-server-json.onrender.com/chat").then((data) => {
     const dataArr = Array.from(data);
+    content.innerHTML=''
     dataArr.map((item) => {
       const box = document.createElement("div");
       const boxInner = document.createElement("div");
@@ -55,3 +66,25 @@ function textshow() {
     });
   });
 }
+const deleteMessage = async (url)=>{
+    try{
+        const response= await fetch(url)
+        const data = await response.json()
+        for(item of data){
+            const deleteMess= await fetch(`${url}/${item.id}`,{
+                method:'DELETE'
+            })
+        }
+    }catch(err){
+        console.error(err)
+    }
+}
+deleteBtn.addEventListener('click', (e)=>{
+    e.preventDefault()
+    deleteMessage('https://chat-server-json.onrender.com/chat')
+    setTimeout(() => {
+        location.reload();
+        
+    }, 3000);
+    
+})

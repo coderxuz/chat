@@ -1,12 +1,12 @@
 {
   "users": [
     {
-      "user": "xursand",
-      "password": "admin",
+      "user": "user",
+      "password": "user",
       "id": "6021"
     },
     {
-      "user": "coder",
+      "user": "admin",
       "password": "admin",
       "id": "6021"
     }

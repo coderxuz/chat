@@ -12,41 +12,41 @@ const get = async (resurs) => {
   const data = await request.json();
   return data;
 };
+const deleteMessage = async (url) => {
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('DELETE so\'rovida xato:', error);
+  }
+};
 
-const post = async (url, data = {}) => {
+// Ma'lumot yuborish funksiyasi
+const post = async (url, data) => {
   try {
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      throw new Error(`Xatolik yuz berdi: ${response.statusText}`);
-    }
     return await response.json();
-  } catch (err) {
-    console.error("Xato:", err);
+  } catch (error) {
+    console.error('POST so\'rovida xato:', error);
   }
 };
-const put = async (url, data) => {
+setInterval(async () => {
   try {
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error(`Xatolik yuz berdi: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (err) {
-    console.error("Xato:", err);
+    const response = await fetch('https://chat-server-json.onrender.com/chat');
+    const messages = await response.json();
+    textshow()
+  } catch (error) {
+    console.error('Xatolik:', error);
   }
-};
+}, 3000);
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (!form.text.value) {
@@ -62,26 +62,6 @@ form.addEventListener("submit", (e) => {
     }, 500);
   }
   form.text.value = "";
-});
-get("https://chat-server-json.onrender.com/active").then((data) => {
-  let dataArr = Array.from(data);
-
-  for (const item of dataArr) {
-    console.log(item);
-    if (localStorage.getItem("user") === "user") {
-      if (item.AdminActive === false) {
-        // textshow()
-        // location.reload();
-        dataArr[0].userActive = true;
-        put('https://chat-server-json.onrender.com/active', dataArr)
-      }
-    } else {
-      if (item.userActive === true) {
-        textshow();
-        location.reload();
-      }
-    }
-  }
 });
 window.addEventListener("DOMContentLoaded", textshow());
 function textshow() {
@@ -105,19 +85,7 @@ function textshow() {
     });
   });
 }
-const deleteMessage = async (url) => {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    for (item of data) {
-      const deleteMess = await fetch(`${url}/${item.id}`, {
-        method: "DELETE",
-      });
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
+
 deleteBtn.addEventListener("click", (e) => {
   e.preventDefault();
   deleteMessage("https://chat-server-json.onrender.com/chat");

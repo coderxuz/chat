@@ -61,10 +61,10 @@ form{
     align-items: center;
     input{
         height: 100%;
-        width: 35%;
     }
     #text{
-        width: 65%;
+        width: 80%;
+        padding:0 20px;
     }
     .submit{
         padding: 10px 20px;
@@ -75,5 +75,17 @@ form{
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        width: 20%;
     }
 }
+@media only screen and (max-width:425px) {
+   #text{
+    width: 65%;
+   }
+   form{
+
+       .submit{
+        width: 35%;
+       }
+   }
+  }

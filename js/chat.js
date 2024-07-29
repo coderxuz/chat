@@ -93,5 +93,5 @@ deleteBtn.addEventListener("click", (e) => {
   deleteMessage("https://chat-server-json.onrender.com/chat");
   setTimeout(() => {
     location.reload();
-  }, 3000);
+  }, 5000);
 });

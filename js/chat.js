@@ -14,16 +14,18 @@ const get = async (resurs) => {
 };
 const deleteMessage = async (url) => {
   try {
-    const response = await fetch(url, {
-      method: 'DELETE',
-    });
-    return await response.json();
-  } catch (error) {
-    console.error('DELETE so\'rovida xato:', error);
+    const response = await fetch(url);
+    const data = await response.json();
+    for (item of data) {
+      const deleteMess = await fetch(`${url}/${item.id}`, {
+        method: "DELETE",
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
 };
 
-// Ma'lumot yuborish funksiyasi
 const post = async (url, data) => {
   try {
     const response = await fetch(url, {

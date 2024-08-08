@@ -1,94 +1,109 @@
+"use strict";
+const POLLING_INTERVAL = 5000;
+const user = localStorage.getItem("user");
+if (!user) {
+    window.open("index.html", "_self");
+}
+const post = async (url, data) => {
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+    }
+    catch (err) {
+        console.error(err);
+    }
+};
+const get1 = async (url) => {
+    const request = await fetch(url);
+    if (!request.ok) {
+        throw new Error(`${request.status}`);
+    }
+    const data = await request.json();
+    return data;
+};
+function startPolling(url) {
+    setInterval(async () => {
+        try {
+            const data = await get1(url);
+            console.log('Yangi ma\'lumotlar:', data);
+            updateContent(data); // Ma'lumotlarni yangilash uchun funksiya
+        }
+        catch (error) {
+            console.error('Polling xatosi:', error);
+        }
+    }, POLLING_INTERVAL);
+}
+const del = async (url) => {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        for (let item of data) {
+            const del = await fetch(`${url}/${item.id}`, {
+                method: "DELETE",
+            });
+        }
+    }
+    catch (err) {
+        console.error(err);
+    }
+};
+function updateContent(data) {
+    const content = document.querySelector('.content');
+    if (content) {
+        content.innerHTML = ''; // Eski ma'lumotlarni tozalash
+        for (let item of data) {
+            const box = document.createElement('div');
+            box.classList.add('box');
+            const boxInner = document.createElement('div');
+            boxInner.classList.add('box-inner');
+            boxInner.innerHTML = `<p>${item.text}</p>`;
+            if (item.user === localStorage.getItem('user')) {
+                boxInner.style.right = '0';
+            }
+            else {
+                boxInner.style.left = '0';
+            }
+            box.appendChild(boxInner);
+            content.appendChild(box);
+        }
+    }
+}
 const nameDiv = document.querySelector(".name");
 const content = document.querySelector(".content");
-const form = document.querySelector("form");
-const h1 = document.createElement("h1");
-nameDiv.appendChild(h1);
-h1.innerHTML = localStorage.getItem("user");
-const deleteBtn = document.createElement("button");
-deleteBtn.innerHTML = "Clear";
-nameDiv.appendChild(deleteBtn);
-const get = async (resurs) => {
-  const request = await fetch(resurs);
-  const data = await request.json();
-  return data;
-};
-const deleteMessage = async (url) => {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    for (item of data) {
-      const deleteMess = await fetch(`${url}/${item.id}`, {
-        method: "DELETE",
-      });
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const post = async (url, data) => {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    return await response.json();
-  } catch (error) {
-    console.error('POST so\'rovida xato:', error);
-  }
-};
-setInterval(async () => {
-  try {
-    const response = await fetch('https://chat-server-json.onrender.com/chat');
-    const messages = await response.json();
-    textshow()
-  } catch (error) {
-    console.error('Xatolik:', error);
-  }
-}, 3000);
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (!form.text.value) {
-    e.preventDefault();
-  } else {
-    const text = {
-      user: localStorage.getItem("user"),
-      text: form.text.value,
-    };
-    post("https://chat-server-json.onrender.com/chat", text);
-    setTimeout(() => {
-      textshow();
-    }, 500);
-  }
-  form.text.value = "";
-});
-window.addEventListener("DOMContentLoaded", textshow());
-function textshow() {
-  get("https://chat-server-json.onrender.com/chat").then((data) => {
-    const dataArr = Array.from(data);
-    content.innerHTML = "";
-    dataArr.map((item) => {
-      const box = document.createElement("div");
-      const boxInner = document.createElement("div");
-      content.appendChild(box);
-      box.appendChild(boxInner);
-      box.classList = "box";
-      boxInner.classList = "box-inner";
-      boxInner.id = item.user;
-      boxInner.innerHTML = `<p>${item.text}</p>`;
-      if (item.user === localStorage.getItem("user")) {
-        boxInner.style.right = "0";
-      } else {
-        boxInner.style.left = "0";
-      }
-    });
-  });
+const formChat = document.querySelector("form");
+if (user) {
+    const h1 = document.createElement("h1");
+    nameDiv.appendChild(h1);
+    h1.innerHTML = user;
 }
-
-deleteBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  deleteMessage("https://chat-server-json.onrender.com/chat");
+const btn = document.createElement("button");
+nameDiv.appendChild(btn);
+btn.innerHTML = "Clear";
+class text {
+    user;
+    text;
+    constructor(user, text) {
+        this.user = user;
+        this.text = text;
+    }
+}
+formChat?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (formChat.text.value === "") {
+        e.preventDefault();
+    }
+    else {
+        const userText1 = new text(`${user}`, `${formChat.text.value}`);
+        post("https://chat-server-json.onrender.com/chat", userText1);
+        formChat.text.value = "";
+    }
 });
+btn.addEventListener("click", () => {
+    del("https://chat-server-json.onrender.com/chat");
+});
+startPolling('https://chat-server-json.onrender.com/chat');
